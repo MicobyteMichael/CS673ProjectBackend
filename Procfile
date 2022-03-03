@@ -1,0 +1,1 @@
+web: gunicorn cs673backend.launcher:flaskapp
