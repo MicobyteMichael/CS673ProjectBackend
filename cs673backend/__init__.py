@@ -8,4 +8,7 @@ def startup():
 	flaskapp = Flask(__name__)
 	flaskapp.secret_key = token_urlsafe(16)
 	
+	start_api(flaskapp)
+	connect()
+	
 	return flaskapp
