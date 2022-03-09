@@ -1,2 +1,2 @@
-def start_api(flaskapp):
+def start_api(flaskapp, db):
 	pass
