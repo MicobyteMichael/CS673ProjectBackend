@@ -4,6 +4,7 @@ from os import environ
 from flask import Flask
 from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
+from flask_restful import Api
 
 from .api import start_api
 
@@ -25,9 +26,10 @@ def startup():
 	flaskapp.config["SQLALCHEMY_DATABASE_URI"] = get_environment_var("DATABASE_URL").replace("postgres", "postgresql+psycopg2")
 	
 	db = SQLAlchemy(flaskapp)
+	api = Api(flaskapp)
 	Session(flaskapp)
 	
-	start_api(flaskapp, db)
+	start_api(flaskapp, db, api)
 	db.create_all()
 	
 	return flaskapp
