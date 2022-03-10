@@ -2,13 +2,24 @@ from flask import session
 from flask_restful import Resource
 from flask_restful.reqparse import RequestParser
 
+from bcrypt import gensalt, hashpw
+from hashlib import sha256
+from hmac import new as hash_mac
+from os import environ
+
+PEPPER = environ["PEPPER"].encode("utf-8")
+
+def hash(password, salt):
+	return hashpw(hash_mac(PEPPER, password.encode("utf-8"), sha256).hexdigest().encode("utf-8"), salt).decode("utf-8")
+
 def start(flaskapp, db, api):
 	class UserAccount(db.Model):
 		id		= db.Column(db.Integer, primary_key = True)
-		username= db.Column(db.String(80), unique = True, nullable = False)
-		password= db.Column(db.String(80), nullable = False)
-		email	= db.Column(db.String(80), unique = True, nullable = False)
-		phone	= db.Column(db.String(20), unique = True, nullable = False)
+		username= db.Column(db.String, unique = True, nullable = False)
+		email	= db.Column(db.String, unique = True, nullable = False)
+		phone	= db.Column(db.String, unique = True, nullable = False)
+		passhash= db.Column(db.String, nullable = False)
+		salt	= db.Column(db.String, nullable = False)
 	
 	class Login(Resource):
 		def __init__(self):
@@ -18,12 +29,16 @@ def start(flaskapp, db, api):
 		
 		def post(self):
 			args = self.parser.parse_args(strict = True)
-			user = UserAccount.query.filter_by(**args).first()
+			user = UserAccount.query.filter_by(username = args["username"]).first()
+			success = False
 			
 			if user is not None:
-				session["user"] = user.username
+				pass_hash = hash(args["password"], user.salt.encode("utf-8"))
+				if pass_hash == user.passhash:
+					session["user"] = user.username
+					success = True
 			
-			return { "authenticated": user is not None }
+			return { "authenticated": success }
 	
 	class Register(Resource):
 		def __init__(self):
@@ -35,7 +50,17 @@ def start(flaskapp, db, api):
 		
 		def post(self):
 			args = self.parser.parse_args(strict = True)
-			user = UserAccount(**args)
+			new_args = { k:v for k, v in args.items() if k != "password" }
+			
+			for k, v in new_args.items():
+				user = UserAccount.query.filter_by(**{k : v}).first()
+				if user is not None:
+					return { "created": False, "reason": "duplicate " + k }
+			
+			salt = gensalt()
+			new_args["salt"] = salt.decode("utf-8")
+			new_args["passhash"] = hash(args["password"], salt)
+			user = UserAccount(**new_args)
 			
 			db.session.add(user)
 			db.session.commit()

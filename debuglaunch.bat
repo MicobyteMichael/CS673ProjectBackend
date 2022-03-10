@@ -13,6 +13,14 @@ echo %DATABASE_URL%
 echo.
 echo.
 
+echo Getting the pepper value...
+for /f "tokens=* usebackq" %%f in (`heroku config:get PEPPER --app cs673projectbackend 2^>nul`) do (
+set PEPPER=%%f
+)
+echo "%PEPPER%"
+echo.
+echo.
+
 echo Launching...
 set FLASK_ENV=development
 python -m cs673backend
