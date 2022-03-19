@@ -68,5 +68,27 @@ def start(flaskapp, db, api):
 			
 			return { "created": True }
 	
-	api.add_resource(Login, "/login")
-	api.add_resource(Register, "/register")
+	class ResetPassword(Resource):
+		def __init__(self):
+			self.parser = RequestParser()
+			self.parser.add_argument("username", type = str, required = True)
+			self.parser.add_argument("newPass", type = str, required = True)
+			self.parser.add_argument("email", type = str, required = True)
+			self.parser.add_argument("phone", type = str, required = True)
+		
+		def post(self):
+			args = self.parser.parse_args(strict = True)
+			new_args = { k:v for k, v in args.items() if k != "newPass" }
+			user = UserAccount.query.filter_by(**new_args).first()
+			
+			if user is not None:
+				user.passhash = hash(args["newPass"], user.salt.encode("utf-8"))
+				db.session.commit()
+				
+				session["user"] = user.username
+			
+			return { "reset": user is not None }
+	
+	api.add_resource(Login,         "/login")
+	api.add_resource(Register,      "/register")
+	api.add_resource(ResetPassword, "/resetpass")
