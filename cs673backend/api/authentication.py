@@ -12,15 +12,7 @@ PEPPER = environ["PEPPER"].encode("utf-8")
 def hash(password, salt):
 	return hashpw(hash_mac(PEPPER, password.encode("utf-8"), sha256).hexdigest().encode("utf-8"), salt).decode("utf-8")
 
-def start(flaskapp, db, api):
-	class UserAccount(db.Model):
-		id		= db.Column(db.Integer, primary_key = True)
-		username= db.Column(db.String, unique = True, nullable = False)
-		email	= db.Column(db.String, unique = True, nullable = False)
-		phone	= db.Column(db.String, unique = True, nullable = False)
-		passhash= db.Column(db.String, nullable = False)
-		salt	= db.Column(db.String, nullable = False)
-	
+def start(flaskapp, db, api, UserAccount):
 	class Login(Resource):
 		def __init__(self):
 			self.parser = RequestParser()
