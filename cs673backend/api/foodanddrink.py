@@ -31,5 +31,20 @@ def start(flaskapp, db, api):
 				return { "glasses": glasses }
 			else:
 				return { "error": "Not signed in" }
+		
+		def put(self):
+			args = self.parser.parse_args(strict = True) | self.parser2.parse_args(strict = True)
+			
+			if "userid" in session:
+				water = Waters.query.filter_by(userid = session["userid"], year = args["year"], day = args["day"]).first()
+				if water is not None:
+					water = Waters(userid = session["userid"], year = args["year"], day = args["day"], glasses = 0)
+				
+				water.glasses = args["glasses"]
+				db.session.commit()
+				
+				return { "updated": True }
+			else:
+				return { "error": "Not signed in" }
 	
 	api.add_resource(WaterGlasses, "/waterintake")
