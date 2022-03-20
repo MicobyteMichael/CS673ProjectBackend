@@ -18,7 +18,7 @@ def start(flaskapp, db, api):
 			self.parser2 = RequestParser()
 			self.parser2.add_argument("glasses", type = int)
 		
-		def post():
+		def post(self):
 			args = self.parser.parse_args(strict = True)
 			
 			if "userid" in session:
