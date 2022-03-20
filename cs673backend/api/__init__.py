@@ -1,5 +1,6 @@
 from .authentication  import start as start_authen
 from .accountsettings import start as start_settings
+from .foodanddrink    import start as start_food
 
 def start_api(flaskapp, db, api):
 	class UserAccount(db.Model):
@@ -12,3 +13,4 @@ def start_api(flaskapp, db, api):
 	
 	start_authen  (flaskapp, db, api, UserAccount)
 	start_settings(flaskapp, db, api, UserAccount)
+	start_food    (flaskapp, db, api)

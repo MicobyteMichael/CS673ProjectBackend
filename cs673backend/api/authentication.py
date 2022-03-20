@@ -28,6 +28,7 @@ def start(flaskapp, db, api, UserAccount):
 				pass_hash = hash(args["password"], user.salt.encode("utf-8"))
 				if pass_hash == user.passhash:
 					session["user"] = user.username
+					session["userid"] = user.id
 					success = True
 			
 			return { "authenticated": success }
@@ -56,7 +57,9 @@ def start(flaskapp, db, api, UserAccount):
 			
 			db.session.add(user)
 			db.session.commit()
+			
 			session["user"] = user.username
+			session["userid"] = user.id
 			
 			return { "created": True }
 	
@@ -78,6 +81,7 @@ def start(flaskapp, db, api, UserAccount):
 				db.session.commit()
 				
 				session["user"] = user.username
+				session["userid"] = user.id
 			
 			return { "reset": user is not None }
 	
