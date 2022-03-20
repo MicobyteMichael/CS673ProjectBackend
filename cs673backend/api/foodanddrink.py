@@ -31,3 +31,5 @@ def start(flaskapp, db, api):
 				return { "glasses": glasses }
 			else:
 				return { "error": "Not signed in" }
+	
+	api.add_resource(WaterGlasses, "/waterintake")
