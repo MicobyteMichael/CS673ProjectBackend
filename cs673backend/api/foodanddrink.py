@@ -39,6 +39,7 @@ def start(flaskapp, db, api):
 				water = Waters.query.filter_by(userid = session["userid"], year = args["year"], day = args["day"]).first()
 				if water is None:
 					water = Waters(userid = session["userid"], year = args["year"], day = args["day"], glasses = 0)
+					db.session.add(water)
 				
 				water.glasses = args["glasses"]
 				db.session.commit()
