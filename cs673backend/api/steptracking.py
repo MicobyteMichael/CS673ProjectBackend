@@ -38,7 +38,7 @@ def start(flaskapp, db, api):
 			if "userid" in session:
 				steps = Steps.query.filter_by(userid = session["userid"], year = args["year"], day = args["day"]).first()
 				if steps is None:
-					steps = Steps(userid = session["userid"], year = args["year"], day = args["day"], glasses = 0)
+					steps = Steps(userid = session["userid"], year = args["year"], day = args["day"], steps = 0)
 					db.session.add(steps)
 				
 				steps.steps = args["steps"]
