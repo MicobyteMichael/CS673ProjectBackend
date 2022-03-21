@@ -80,11 +80,11 @@ def start(flaskapp, db, api):
 			args = self.parser.parse_args() | self.parser2.parse_args()
 			
 			if "userid" in session:
-				existint_meal = Meals.query.filter_by(userid = session["userid"], year = args["year"], day = args["day"], meal = args["meal"]).first()
+				existint_meal = Meals.query.filter_by(userid = session["userid"], year = args["year"], day = args["day"], meal = args["mealname"]).first()
 				if existint_meal is not None:
 					return { "error": "A meal with that name is already added" }
 				
-				db.session.add(Meals(userid = session["userid"], year = args["year"], day = args["day"], meal = args["meal"], calories = args["calories"]))
+				db.session.add(Meals(userid = session["userid"], year = args["year"], day = args["day"], meal = args["mealname"], calories = args["calories"]))
 				db.session.commit()
 				
 				return { "added": True }
