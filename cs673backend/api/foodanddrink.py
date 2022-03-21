@@ -70,7 +70,9 @@ def start(flaskapp, db, api):
 			
 			if "userid" in session:
 				meals = (Meals.query.filter_by(userid = session["userid"], year = args["year"], day = args["day"]).all()) or []
-				return [ { "meal": meal.meal, "calories": meal.calories } for meal in meals ]
+				meals_data = [ { "meal": meal.meal, "calories": meal.calories } for meal in meals ]
+				
+				return { "meals": meals_data }
 			else:
 				return { "error": "Not signed in" }
 		
