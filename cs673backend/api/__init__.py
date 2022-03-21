@@ -4,6 +4,7 @@ from .foodanddrink    import start as start_food
 from .sleeptracking   import start as start_sleep
 from .bodycomposition import start as start_bodycomp
 from .steptracking    import start as start_steps
+from .exercise        import start as start_exercise
 
 def start_api(flaskapp, db, api):
 	class UserAccount(db.Model):
@@ -20,3 +21,4 @@ def start_api(flaskapp, db, api):
 	start_sleep   (flaskapp, db, api)
 	start_bodycomp(flaskapp, db, api)
 	start_steps   (flaskapp, db, api)
+	start_exercise(flaskapp, db, api)
