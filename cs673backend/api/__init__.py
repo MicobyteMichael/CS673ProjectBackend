@@ -2,6 +2,7 @@ from .authentication  import start as start_authen
 from .accountsettings import start as start_settings
 from .foodanddrink    import start as start_food
 from .sleeptracking   import start as start_sleep
+from .bodycomposition import start as start_bodycomp
 
 def start_api(flaskapp, db, api):
 	class UserAccount(db.Model):
@@ -16,3 +17,4 @@ def start_api(flaskapp, db, api):
 	start_settings(flaskapp, db, api, UserAccount)
 	start_food    (flaskapp, db, api)
 	start_sleep   (flaskapp, db, api)
+	start_bodycomp(flaskapp, db, api)
