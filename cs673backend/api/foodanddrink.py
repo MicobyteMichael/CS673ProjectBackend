@@ -20,7 +20,7 @@ def start(flaskapp, db, api):
 		def __init__(self):
 			self.parser = RequestParser()
 			self.parser.add_argument("year", type = int, required = True)
-			self.parser.add_argument("day", type = int, required = True)
+			self.parser.add_argument("day",  type = int, required = True)
 			
 			self.parser2 = RequestParser()
 			self.parser2.add_argument("glasses", type = int, required = True)
@@ -59,7 +59,7 @@ def start(flaskapp, db, api):
 		def __init__(self):
 			self.parser = RequestParser()
 			self.parser.add_argument("year", type = int, required = True)
-			self.parser.add_argument("day", type = int, required = True)
+			self.parser.add_argument("day",  type = int, required = True)
 			
 			self.parser2 = RequestParser()
 			self.parser2.add_argument("mealname", type = str, required = True)
@@ -80,8 +80,8 @@ def start(flaskapp, db, api):
 			args = self.parser.parse_args() | self.parser2.parse_args()
 			
 			if "userid" in session:
-				existint_meal = Meals.query.filter_by(userid = session["userid"], year = args["year"], day = args["day"], meal = args["mealname"]).first()
-				if existint_meal is not None:
+				existing_meal = Meals.query.filter_by(userid = session["userid"], year = args["year"], day = args["day"], meal = args["mealname"]).first()
+				if existing_meal is not None:
 					return { "error": "A meal with that name is already added" }
 				
 				db.session.add(Meals(userid = session["userid"], year = args["year"], day = args["day"], meal = args["mealname"], calories = args["calories"]))
