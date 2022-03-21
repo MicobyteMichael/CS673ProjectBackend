@@ -62,7 +62,7 @@ def start(flaskapp, db, api):
 			self.parser.add_argument("day", type = int, required = True)
 			
 			self.parser2 = RequestParser()
-			self.parser.add_argument("mealname", type = str, required = True)
+			self.parser2.add_argument("mealname", type = str, required = True)
 			self.parser2.add_argument("calories", type = int, required = True)
 		
 		def post(self):
