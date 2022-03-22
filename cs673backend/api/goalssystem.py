@@ -36,7 +36,7 @@ def start(flaskapp, db, api):
 		
 		def get(self):
 			if "userid" in session:
-				goals = (Goals.query.filter_by(userid = session["userid"].all())) or []
+				goals = (Goals.query.filter_by(userid = session["userid"]).all()) or []
 				goals_data = [ { "name": goal.name, "type": goal.type, "comp": goal.comp, "thresh": goal.thresh, "param": goal.param, "active": goal.active } for goal in goals ]
 				return { "goals": goals_data }
 			else:
