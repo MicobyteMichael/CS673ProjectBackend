@@ -8,7 +8,8 @@ def start(flaskapp, db, api):
 		name   = db.Column(db.String,  primary_key = True )
 		type   = db.Column(db.String,  nullable    = False)
 		comp   = db.Column(db.String,  nullable    = False)
-		thresh = db.Column(db.Integer, nullable    = False)
+		thresh = db.Column(db.Float,   nullable    = False)
+		param  = db.Column(db.String                      )
 		active = db.Column(db.Boolean, nullable    = False)
 	
 	class GoalAchievements(db.Model):
@@ -24,9 +25,11 @@ def start(flaskapp, db, api):
 			self.parser.add_argument("name", type = str, required = True)
 			
 			self.parser2 = RequestParser()
-			self.parser2.add_argument("type",   type = str, required = True)
-			self.parser2.add_argument("comp",   type = str, required = True)
-			self.parser2.add_argument("thresh", type = int, required = True)
+			self.parser2.add_argument("type",   type = str,   required = True)
+			self.parser2.add_argument("comp",   type = str,   required = True)
+			self.parser2.add_argument("thresh", type = float, required = True)
+			self.parser2.add_argument("param",  type = str)
+			self.parser2.add_argument("active", type = bool)
 			
 			self.parser3 = RequestParser()
 			self.parser3.add_argument("active", type = bool, required = True)
@@ -34,20 +37,8 @@ def start(flaskapp, db, api):
 		def get(self):
 			if "userid" in session:
 				goals = (Goals.query.filter_by(userid = session["userid"].all()) or []
-				goals_data = [ { "name": goal.name, "type": goal.type, "comp": goal.comp, "thresh": goal.thresh } for goal in goals ]
+				goals_data = [ { "name": goal.name, "type": goal.type, "comp": goal.comp, "thresh": goal.thresh, "param": goal.param, "active": goal.active } for goal in goals ]
 				return { "goals": goals_data }
-			else:
-				return { "error": "Not signed in" }
-		
-		def post(self):
-			args = self.parser.parse_args(strict = True)
-			
-			if "userid" in session:
-				goal = Goals.query.filter_by(userid = session["userid"], name = args["name"]).first()
-				if goal is None:
-					return { "error": "No goal exists by that name" }
-				else:
-					return { "name": goal.name, "type": goal.type, "comp": goal.comp, "thresh": goal.thresh }
 			else:
 				return { "error": "Not signed in" }
 		
@@ -59,7 +50,7 @@ def start(flaskapp, db, api):
 				if existing_goal is not None:
 					return { "error": "A goal with that name is already added" }
 				
-				db.session.add(Goals(userid = session["userid"], name = args["name"], type = args["type"], comp = args["comp"], thresh = args["thresh"], active = True))
+				db.session.add(Goals(userid = session["userid"], name = args["name"], type = args["type"], comp = args["comp"], thresh = args["thresh"], param = args["param"], active = args["active"]))
 				db.session.commit()
 				
 				return { "added": True }

@@ -3,7 +3,7 @@ from flask_restful import Resource
 from flask_restful.reqparse import RequestParser
 
 def start(flaskapp, db, api):
-	class ExcerciseSessions(db.Model):
+	class ExerciseSessions(db.Model):
 		userid    = db.Column(db.Integer, primary_key = True)
 		year      = db.Column(db.Integer, primary_key = True)
 		day       = db.Column(db.Integer, primary_key = True)
@@ -13,6 +13,7 @@ def start(flaskapp, db, api):
 		end       = db.Column(db.Integer)
 		heartrate = db.Column(db.Integer)
 		calories  = db.Column(db.Integer)
+		parameter = db.Column(db.Integer)
 	
 	class Exercise(Resource):
 		def __init__(self):
@@ -31,13 +32,14 @@ def start(flaskapp, db, api):
 			self.parser4.add_argument("end",       type = int, required = True)
 			self.parser4.add_argument("heartrate", type = int, required = True)
 			self.parser4.add_argument("calories",  type = int, required = True)
+			self.parser4.add_argument("parameter", type = int, required = True)
 		
 		def post(self):
 			args = self.parser.parse_args(strict = True)
 			
 			if "userid" in session:
-				sessions = (ExcerciseSessions.query.filter_by(userid = session["userid"], year = args["year"], day = args["day"]).all()) or []
-				sessions_data = [ { "name": session.name, "type": session.type, "start": session.start, "end": session.end, "heartrate": session.heartrate, "calories": session.calories } for session in sessions ]
+				sessions = (ExerciseSessions.query.filter_by(userid = session["userid"], year = args["year"], day = args["day"]).all()) or []
+				sessions_data = [ { "name": session.name, "type": session.type, "start": session.start, "end": session.end, "heartrate": session.heartrate, "calories": session.calories, "parameter": session.parameter } for session in sessions ]
 				
 				return { "sessions": sessions_data }
 			else:
@@ -47,11 +49,11 @@ def start(flaskapp, db, api):
 			args = self.parser.parse_args() | self.parser2.parse_args() | self.parser3.parse_args()
 			
 			if "userid" in session:
-				existing_session = ExcerciseSessions.query.filter_by(userid = session["userid"], year = args["year"], day = args["day"], name = args["name"]).first()
+				existing_session = ExerciseSessions.query.filter_by(userid = session["userid"], year = args["year"], day = args["day"], name = args["name"]).first()
 				if existing_session is not None:
 					return { "error": "An exercise session with that name is already added" }
 				
-				db.session.add(ExcerciseSessions(userid = session["userid"], year = args["year"], day = args["day"], name = args["name"], type = args["type"], start = args["start"], end = None, heartrate = None, calories = None))
+				db.session.add(ExerciseSessions(userid = session["userid"], year = args["year"], day = args["day"], name = args["name"], type = args["type"], start = args["start"], end = None, heartrate = None, calories = None, parameter = None))
 				db.session.commit()
 				
 				return { "added": True }
@@ -62,13 +64,14 @@ def start(flaskapp, db, api):
 			args = self.parser.parse_args() | self.parser2.parse_args() | self.parser4.parse_args()
 			
 			if "userid" in session:
-				existing_session = ExcerciseSessions.query.filter_by(userid = session["userid"], year = args["year"], day = args["day"], name = args["name"]).first()
+				existing_session = ExerciseSessions.query.filter_by(userid = session["userid"], year = args["year"], day = args["day"], name = args["name"]).first()
 				if existing_session is None:
 					return { "error": "An exercise session with that name does not exist" }
 				
 				existing_session.end       = args["end"      ]
 				existing_session.heartrate = args["heartrate"]
 				existing_session.calories  = args["calories" ]
+				existing_session.parameter = args["parameter"]
 				db.session.commit()
 				
 				return { "updated": True }
