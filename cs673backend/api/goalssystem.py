@@ -85,7 +85,7 @@ def start(flaskapp, db, api):
 			
 			if "userid" in session:
 				achievement = GoalAchievements.query.filter_by(userid = session["userid"], year = args["year"], day = args["day"], name = args["name"]).first()
-				return { "achieved": achieved is not None }
+				return { "achieved": achievement is not None }
 			else:
 				return { "error": "Not signed in" }
 		
