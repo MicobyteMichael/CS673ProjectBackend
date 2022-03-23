@@ -96,10 +96,10 @@ def start(flaskapp, db, api):
 			args = self.parser.parse_args()
 			
 			if "userid" in session:
-				achievement = GoalAchievements.query.filter_by(userid = session["userid"], name = args["name"], day = args["day"], name = args["name"]).first()
+				achievement = GoalAchievements.query.filter_by(userid = session["userid"], year = args["year"], day = args["day"], name = args["name"]).first()
 				
-				if achievement is not None:
-					db.session.add(GoalAchievements(userid = session["userid"], name = args["name"], day = args["day"], name = args["name"]))
+				if achievement is None:
+					db.session.add(GoalAchievements(userid = session["userid"], year = args["year"], day = args["day"], name = args["name"]))
 					db.session.commit()
 				
 				return { "submitted": True }
