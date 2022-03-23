@@ -76,10 +76,12 @@ def start(flaskapp, db, api):
 			self.parser = RequestParser()
 			self.parser.add_argument("year", type = int, required = True)
 			self.parser.add_argument("day",  type = int, required = True)
-			self.parser.add_argument("name", type = str, required = True)
+			
+			self.parser2 = RequestParser()
+			self.parser2.add_argument("name", type = str, required = True)
 		
 		def post(self):
-			args = self.parser.parse_args()
+			args = self.parser.parse_args() | self.parser2.parse_args()
 			
 			if "userid" in session:
 				achievement = GoalAchievements.query.filter_by(userid = session["userid"], year = args["year"], day = args["day"], name = args["name"]).first()
@@ -93,7 +95,7 @@ def start(flaskapp, db, api):
 				return { "error": "Not signed in" }
 		
 		def put(self):
-			args = self.parser.parse_args()
+			args = self.parser.parse_args() | self.parser2.parse_args()
 			
 			if "userid" in session:
 				achievement = GoalAchievements.query.filter_by(userid = session["userid"], year = args["year"], day = args["day"], name = args["name"]).first()
@@ -103,6 +105,15 @@ def start(flaskapp, db, api):
 					db.session.commit()
 				
 				return { "submitted": True }
+			else:
+				return { "error": "Not signed in" }
+		
+		def patch(self):
+			args = self.parser.parse_args(strict = True)
+			
+			if "userid" in session:
+				achievements = (GoalAchievements.query.filter_by(userid = session["userid"], year = args["year"], day = args["day"]).all()) or []
+				return { "successes": [ ach.name for ach in achievements ] }
 			else:
 				return { "error": "Not signed in" }
 	
