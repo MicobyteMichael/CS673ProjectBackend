@@ -22,6 +22,14 @@ def start(flaskapp, db, api):
 			self.parser2.add_argument("bodyfat", type = int, required = True)
 			self.parser2.add_argument("muscle",  type = int, required = True)
 		
+		def get(self):
+			if "userid" in session:
+				comps = (BodyCompositions.query.filter_by(userid = session["userid"]).order_by(BodyCompTracking.year.desc(), BodyCompTracking.day.desc()).all()) or []
+				comps_data = [ { "year": comp.year, "day": comp.day, "weight": comp.weight, "fatpercentage": comp.bodyfat, "muscle": comp.muscle } for comp in comps ]
+				return { "comp_history": comps_data }
+			else:
+				return { "error": "Not signed in" }
+		
 		def post(self):
 			args = self.parser.parse_args(strict = True)
 			
