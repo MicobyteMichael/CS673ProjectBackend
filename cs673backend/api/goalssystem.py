@@ -13,11 +13,10 @@ def start(flaskapp, db, api):
 		active = db.Column(db.Boolean, nullable    = False)
 	
 	class GoalAchievements(db.Model):
-		userid   = db.Column(db.Integer, primary_key = True )
-		year     = db.Column(db.Integer, primary_key = True )
-		day      = db.Column(db.Integer, primary_key = True )
-		name     = db.Column(db.String,  primary_key = True )
-		achieved = db.Column(db.Boolean, nullable    = False)
+		userid   = db.Column(db.Integer, primary_key = True)
+		year     = db.Column(db.Integer, primary_key = True)
+		day      = db.Column(db.Integer, primary_key = True)
+		name     = db.Column(db.String,  primary_key = True)
 	
 	class GoalTracking(Resource):
 		def __init__(self):
@@ -72,4 +71,40 @@ def start(flaskapp, db, api):
 			else:
 				return { "error": "Not signed in" }
 	
-	api.add_resource(GoalTracking, "/goals")
+	class GoalAchievementTracking(Resource):
+		def __init__(self):
+			self.parser = RequestParser()
+			self.parser.add_argument("year", type = int, required = True)
+			self.parser.add_argument("day",  type = int, required = True)
+			self.parser.add_argument("name", type = str, required = True)
+		
+		def post(self):
+			args = self.parser.parse_args()
+			
+			if "userid" in session:
+				achievement = GoalAchievements.query.filter_by(userid = session["userid"], year = args["year"], day = args["day"], name = args["name"]).first()
+				achieved = False
+				
+				if achievement is not None:
+					achieved = achievement.achieved
+				
+				return { "achieved": achieved }
+			else:
+				return { "error": "Not signed in" }
+		
+		def put(self):
+			args = self.parser.parse_args()
+			
+			if "userid" in session:
+				achievement = GoalAchievements.query.filter_by(userid = session["userid"], name = args["name"], day = args["day"], name = args["name"]).first()
+				
+				if achievement is not None:
+					db.session.add(GoalAchievements(userid = session["userid"], name = args["name"], day = args["day"], name = args["name"]))
+					db.session.commit()
+				
+				return { "submitted": True }
+			else:
+				return { "error": "Not signed in" }
+	
+	api.add_resource(GoalTracking,            "/goals")
+	api.add_resource(GoalAchievementTracking, "/goalsuccesses")
