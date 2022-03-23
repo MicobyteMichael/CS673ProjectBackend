@@ -24,7 +24,7 @@ def start(flaskapp, db, api):
 		
 		def get(self):
 			if "userid" in session:
-				comps = (BodyCompositions.query.filter_by(userid = session["userid"]).order_by(BodyCompTracking.year.desc(), BodyCompTracking.day.desc()).all()) or []
+				comps = (BodyCompositions.query.filter_by(userid = session["userid"]).order_by(BodyCompositions.year.desc(), BodyCompositions.day.desc()).all()) or []
 				comps_data = [ { "year": comp.year, "day": comp.day, "weight": comp.weight, "fatpercentage": comp.bodyfat, "muscle": comp.muscle } for comp in comps ]
 				return { "comp_history": comps_data }
 			else:
