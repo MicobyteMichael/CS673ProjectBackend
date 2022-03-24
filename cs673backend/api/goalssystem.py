@@ -70,6 +70,21 @@ def start(flaskapp, db, api):
 				return { "updated": True }
 			else:
 				return { "error": "Not signed in" }
+		
+		def delete(self):
+			args = self.parser.parse_args(strict = True)
+			
+			if "userid" in session:
+				existing_goal = Goals.query.filter_by(userid = session["userid"], name = args["name"]).first()
+				if existing_goal is None:
+					return { "error": "No goal with that name exists" }
+				
+				db.session.delete(existing_goal)
+				db.session.commit()
+				
+				return { "removed": True }
+			else:
+				return { "error": "Not signed in" }
 	
 	class GoalAchievementTracking(Resource):
 		def __init__(self):
